@@ -1,0 +1,47 @@
+<?php
+/**
+ * @copyright Copyright &copy; Dmytro Mytrofanov, 2014 - 2023
+ * @package dui-utils
+ * @version 1.0.0
+ */
+
+namespace components;
+
+use Yii;
+use yii\rest\Controller;
+use yii\base\Action;
+
+abstract class DuiRestAction extends Action
+{
+    public $request;
+    public $response;
+
+    /**
+     * @param int $id
+     * @param Controller $controller
+     * @param array $config
+     */
+    public function __construct($id, Controller $controller, array $config = [])
+    {
+        parent::__construct($id, $controller, $config);
+        $this->request = Yii::$app->getRequest();
+        $this->response = [];
+    }
+
+    /**
+     * @param mixed $dataProvider
+     * @return array
+     */
+    public function getDataProviderResponse(mixed $dataProvider): array
+    {
+        $total = $dataProvider->totalCount;
+        $perPage = $dataProvider->pagination->pageSize;
+        $this->response['data']['result'] = $dataProvider;
+        $this->response['data']['pageCount'] = ceil($total / $perPage);
+        $this->response['data']['perPage'] = $perPage;
+        $this->response['data']['currentPage'] = $dataProvider->pagination->page;
+        $this->response['data']['total'] = $total;
+
+        return $this->response;
+    }
+}

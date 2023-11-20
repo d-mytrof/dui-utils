@@ -1,0 +1,27 @@
+{
+    "name": "d-mytrof/dui-utils",
+    "description": "Collection of useful utils",
+    "keywords": [
+        "dui",
+        "extension"
+    ],
+    "homepage": "https://github.com/d-mytrof/dui-utils",
+    "type": "yii2-extensions",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Dmytro Mytrofanov",
+            "email": "dmitrof.development@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "dmytrof\\utils\\": "src"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
