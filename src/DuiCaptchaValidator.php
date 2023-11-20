@@ -9,7 +9,7 @@ namespace dmytrof\utils;
 
 use Yii;
 use yii\validators\Validator;
-use components\DuiCaptchaWidget;
+use dmytrof\utils\DuiCaptchaWidget;
 
 class DuiCaptchaValidator extends Validator
 {
