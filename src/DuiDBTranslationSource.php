@@ -5,7 +5,7 @@
  * @version 1.0.0
  */
 
-namespace components;
+namespace dmytrof\utils;
 
 use yii\i18n\PhpMessageSource;
 use models\Translation;

@@ -19,7 +19,7 @@
   }
  */
 
-namespace components;
+namespace dmytrof\utils;
 
 use Yii;
 use yii\base\Exception;

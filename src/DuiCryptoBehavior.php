@@ -5,7 +5,7 @@
  * @version 1.0.0
  */
 
-namespace components;
+namespace dmytrof\utils;
 
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
