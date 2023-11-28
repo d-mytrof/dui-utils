@@ -16,6 +16,9 @@ class DuiCryptoBehavior extends Behavior
 {
     public $attributes = [];
 
+    /**
+     * @return array
+     */
     public function events(): array
     {
         return [
@@ -37,6 +40,9 @@ class DuiCryptoBehavior extends Behavior
         ];
     }
 
+    /**
+     * @return void
+     */
     protected function decode(): void
     {
         foreach ($this->attributes as $attribute) {
@@ -61,6 +67,9 @@ class DuiCryptoBehavior extends Behavior
         }
     }
 
+    /**
+     * @return void
+     */
     protected function encode(): void
     {
         foreach ($this->attributes as $attribute) {

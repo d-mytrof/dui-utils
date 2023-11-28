@@ -8,25 +8,27 @@
 namespace dmytrof\utils;
 
 use Yii;
-use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
-use models\SystemClient;
+use yii\filters\auth\HttpBearerAuth;
 use yii\web\ForbiddenHttpException;
 
-class DuiHttpSystemBearerAuth extends BaseHttpBearerAuth
+class DuiHttpSystemBearerAuth extends HttpBearerAuth
 {
+    public $entityClassName;
+    
     /**
      * {@inheritdoc}
      */
     public function authenticate($user, $request, $response)
     {
+        $entity = new $this->entityClassName;
         Yii::$app->client->clientPublicKey = $request->getHeaders()->get('x-api-system-client');
         $token = $request->getHeaders()->get('x-api-system-client-token');
 
         if (Yii::$app->client->clientPublicKey) {
-            $identity = SystemClient::findOne([
+            $identity = $entity::findOne([
                 'client_id' => Yii::$app->appSecurity->getEncrypted(Yii::$app->client->clientPublicKey),
-                'client_type' => SystemClient::TYPE_SYSTEM,
-                'status' => SystemClient::STATUS_ACTIVE,
+                'client_type' => $entity::TYPE_SYSTEM,
+                'status' => $entity::STATUS_ACTIVE,
             ]);
             if (!$identity) {
                 return null;

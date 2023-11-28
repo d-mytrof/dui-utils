@@ -8,20 +8,21 @@
 namespace dmytrof\utils;
 
 use Yii;
-use models\User;
-use models\UserAccessToken;
 
 class DuiUser extends \yii\web\User
 {
+    public $tokenEntityClassName;
+    
     /**
      * Finds user by access token
      *
      * @param string $token
      * @return static|null
      */
-    public static function findByAccessToken($token)
+    public function findByAccessToken($token)
     {
-        $model = UserAccessToken::find()
+        $entity = new $this->tokenEntityClassName;
+        $model = $entity::find()
             ->where(['=', 'token', $token])
             ->andWhere(['>', 'expired_at', time()])
             ->one();

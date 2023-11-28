@@ -8,16 +8,18 @@
 namespace dmytrof\utils;
 
 use yii\i18n\PhpMessageSource;
-use models\Translation;
 use Yii;
 use yii\helpers\ArrayHelper;
 
 class DuiDBTranslationSource extends PhpMessageSource
 {
+    public $entityClassName;
+    
     protected function loadMessages($category, $language)
     {
         $messages = [];
-        $items = Translation::findAll(['group' => $category]);
+        $entity = new $this->entityClassName;
+        $items = $entity::findAll(['group' => $category]);
         $languageShortName = Yii::$app->config->languageShortName($language ?? null);
 
         if ($items && $languageShortName) {

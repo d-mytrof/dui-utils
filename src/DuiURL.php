@@ -10,7 +10,7 @@ namespace dmytrof\utils;
 use Yii;
 use yii\base\Component;
 use yii\helpers\Url;
-use components\DuiConfig;
+use dmytrof\utils\DuiConfig;
 
 /**
  * URL class.

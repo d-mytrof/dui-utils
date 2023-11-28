@@ -9,8 +9,6 @@ namespace dmytrof\utils;
 
 use Yii;
 use yii\base\Component;
-use modules\geo\models\GeoCountry;
-use modules\geo\models\GeoCity;
 
 class DuiCountry extends Component
 {
@@ -20,9 +18,15 @@ class DuiCountry extends Component
     public static $sort = true;
     public static $byCitiesFromConfig = false;
 
-    public static function getCountryNameById($id)
+    /**
+     * @param string $entityClassName
+     * @param int $id
+     * @return string
+     */
+    public static function getCountryNameById(string $entityClassName, int $id): string
     {
-        $model = GeoCountry::find()
+        $entity = new $entityClassName;
+        $model = $entity::find()
                 ->where(['=', 'id', $id])
                 ->select(['id', 'country'])
                 ->one();
@@ -318,16 +322,19 @@ class DuiCountry extends Component
     }
 
     /**
+     * SuppressWarnings(PHPMD)
+     * @param string $entityClassName
      * @param string $language
      * @param int $countryID
      * @return array|null
-     * @SuppressWarnings(PHPMD)
      */
     public static function getCities(
+        string $entityClassName,
         string $language = null,
         int $countryID = null
     ): ?array {
-        $query = GeoCity::find()->select([
+        $entity = new $entityClassName;
+        $query = $entity::find()->select([
                     'id',
                     'obl',
                     'city_en', 'city_region_en',

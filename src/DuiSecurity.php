@@ -11,7 +11,6 @@ use Yii;
 use yii\db\Expression;
 use yii\db\Query;
 use Exception;
-use models\User;
 use yii\base\Component;
 
 class DuiSecurity extends Component
@@ -49,11 +48,11 @@ class DuiSecurity extends Component
     /**
      * Encode session ID
      * @param string|float $time
-     * @param User $user
+     * @param mixed $user
      * @param string $passwordValue
      * @return string
      */
-    public function encodeToken(string|float $time, User $user, string $passwordValue): string
+    public function encodeToken(string|float $time, mixed $user, string $passwordValue): string
     {
         $ivlen = openssl_cipher_iv_length($cipher = 'AES-256-CBC');
         $iv = openssl_random_pseudo_bytes($ivlen);

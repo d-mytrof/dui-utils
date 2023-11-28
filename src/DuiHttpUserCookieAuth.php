@@ -8,16 +8,20 @@
 namespace dmytrof\utils;
 
 use Yii;
-use models\User;
 
 class DuiHttpUserCookieAuth extends \yii\filters\auth\AuthMethod
 {
     public $cookie = 'sid';
+    public $entityClassName;
 
     public function authenticate($user, $request, $response)
     {
-        $token = isset($_COOKIE[$this->cookie]) ? $_COOKIE[$this->cookie] : null;
-        $identity = User::findByAccessToken($token);
+        $cookies = Yii::$app->request->cookies;
+        $token = isset($cookies[$this->cookie]) ? $cookies[$this->cookie] : null;
+        if ($token) {
+            $entity = new $this->entityClassName;
+            $identity = $entity::findByAccessToken($token);
+        }
 
         if ($identity !== null) {
             Yii::$app->user->setIdentity($identity);

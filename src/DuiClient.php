@@ -12,7 +12,6 @@ use yii\base\Component;
 use yii\httpclient\Client;
 use yii\httpclient\CurlTransport;
 use yii\httpclient\Response;
-use models\SystemClient;
 
 class DuiClient extends Component
 {
@@ -35,15 +34,17 @@ class DuiClient extends Component
 
     public $systemPublicKey;
     public $systemPrivateKey;
+    
+    public $entityClassName;
 
 
     /**
      * Check token is valid
      * @param string $token
-     * @param SystemClient $model
+     * @param mixed $model
      * @return bool
      */
-    public function tokenIsValid(string $token, SystemClient $model): bool
+    public function tokenIsValid(string $token, mixed $model): bool
     {
         $data = $this->decodeClientToken($token);
         if (!is_array($data) || count($data) < self::TOKEN_DATA_ITEMS_COUNT) {
@@ -207,10 +208,11 @@ class DuiClient extends Component
         $request = Yii::$app->request;
         Yii::$app->client->clientPublicKey = $request->getHeaders()->get('x-api-client');
         if (Yii::$app->client->clientPublicKey) {
-            $model = SystemClient::findOne([
+            $entity = new $this->entityClassName;
+            $model = $entity::findOne([
                 'client_id' => Yii::$app->appSecurity->getEncrypted(Yii::$app->client->clientPublicKey),
-                'client_type' => SystemClient::TYPE_CLIENT,
-                'status' => SystemClient::STATUS_ACTIVE,
+                'client_type' => $entity::TYPE_CLIENT,
+                'status' => $entity::STATUS_ACTIVE,
             ]);
 
             if (!$model) {
