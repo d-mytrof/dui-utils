@@ -63,7 +63,7 @@ class DuiHttpHybridBearerAuth extends BaseHttpBearerAuth
     public function authenticate($user, $request, $response)
     {
         $this->setParams($user);
-        $jwt = $this->getGwt();
+        $jwt = $this->getGwt($request);
 
         if (!$jwt) {
             return null;
