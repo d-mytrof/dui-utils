@@ -1,6 +1,7 @@
 <?php
+
 /**
- * @copyright Copyright &copy; Dmytro Mytrofanov, 2014 - 2023
+ * @copyright Copyright © 2024 Dmytro Mytrofanov
  * @package dui-utils
  * @version 1.0.0
  */

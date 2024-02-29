@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright &copy; Dmytro Mytrofanov, 2014 - 2023
+ * @copyright Copyright © 2024 Dmytro Mytrofanov
  * @package dui-utils
  * @version 1.0.0
  */
@@ -12,10 +12,14 @@ use yii\db\Expression;
 use yii\db\Query;
 use Exception;
 use yii\base\Component;
+use yii\helpers\Json;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class DuiSecurity extends Component
 {
-
+    public const JWT_METHOD = 'HS256';
+    
     public $passwordSalt;
             
     public $tokenSecretKey;
@@ -26,6 +30,8 @@ class DuiSecurity extends Component
     public $captchaLifetime;
         
     public $dbSecretKey;
+    
+    public $entityClassName;
     
     public function init()
     {
@@ -161,5 +167,56 @@ class DuiSecurity extends Component
         } catch (Exception $ex) {
             return null;
         }
+    }
+    
+    /**
+     * @param string $jwt
+     * @param string $encodeMethod
+     * @return array|null
+     */
+    public function getGwtParams(string $jwt = null, string $encodeMethod = null): ?array
+    {
+        $params = null;
+        if (!$jwt) {
+            $authHeader = Yii::$app->request->getHeaders()->get('Authorization');
+            $pattern = '/^Bearer\s+(.*?)$/';
+            if ($authHeader !== null) {
+                if ($pattern !== null) {
+                    if (preg_match($pattern, $authHeader, $matches)) {
+                        $jwt = $matches[1];
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        }
+        
+        if (!$jwt) {
+            return null;
+        }
+
+        $tks = explode('.', $jwt);
+        if (count($tks) !== 3) {
+            return null;
+        }
+        $bodyb64 = $tks[1];
+        $json = Json::decode(base64_decode($bodyb64), false);
+        
+        $entity = new $this->entityClassName;
+        $model = $entity::findOne([
+            'client_id' => Yii::$app->appSecurity->getEncrypted($json->client_id),
+            'status' => $entity::STATUS_ACTIVE,
+        ]);
+        if (!$model) {
+            return null;
+        }
+
+        try {
+            $params = JWT::decode($jwt, new Key($model->private_key, $encodeMethod ? $encodeMethod : self::JWT_METHOD));
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return (array)$params;
     }
 }
