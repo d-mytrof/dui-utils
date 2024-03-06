@@ -24,6 +24,7 @@ class DuiClient extends Component
     public const HEADER_BEARER = 'Bearer';
     public const HEADER_ACCEPT = 'Accept';
     public const HEADER_CONTENT_TYPE = 'Content-Type';
+    public const HEADER_LANGUAGE = 'Lang';
 
     public $tokenLifetime = 60 * 10; //10 minutes
 
@@ -31,6 +32,9 @@ class DuiClient extends Component
     public $clientPrivateKey;
     public $endpoint;
     public $verifySSLHost = true;
+    public $headerAccept = 'application/json';
+    public $headerContentType = 'application/json';
+    public $headerAuthorization;
 
     public $systemPublicKey;
     public $systemPrivateKey;
@@ -129,18 +133,21 @@ class DuiClient extends Component
             $request = (new Client([
                         'transport' => CurlTransport::class,
                             ]))->createRequest();
+
             if ($this->verifySSLHost === false) {
                 $request->setOptions([
                     'SSL_VERIFYPEER' => false,
                     'SSL_VERIFYHOST' => false,
                 ]);
             }
+
             $response = $request->setFormat(Client::FORMAT_JSON)
                     ->setHeaders([
-                        self::HEADER_ACCEPT => 'application/json',
-                        self::HEADER_CONTENT_TYPE => 'application/json',
-                        self::HEADER_CLIENT_ID => $this->clientPublicKey,
-                        self::HEADER_AUTHORIZATION => self::HEADER_BEARER . ' ' . $this->generateClientToken()
+                        self::HEADER_ACCEPT => $this->headerAccept,
+                        self::HEADER_CONTENT_TYPE => $this->headerContentType,
+                        self::HEADER_AUTHORIZATION => !empty($this->headerAuthorization) ?
+                            $this->headerAuthorization : Yii::$app->request->getHeaders()->get(self::HEADER_AUTHORIZATION),
+                        self::HEADER_LANGUAGE => Yii::$app->request->getHeaders()->get(self::HEADER_LANGUAGE)
                     ])
                     ->setMethod($requestMethod)
                     ->setUrl($this->buildEndpoint($action))
@@ -198,31 +205,5 @@ class DuiClient extends Component
         } catch (\Exception $ex) {
             return null;
         }
-    }
-
-    /**
-     * @return bool
-     */
-    public function getClientByHeaders(): bool
-    {
-        $request = Yii::$app->request;
-        Yii::$app->client->clientPublicKey = $request->getHeaders()->get('x-api-client');
-        if (Yii::$app->client->clientPublicKey) {
-            $entity = new $this->entityClassName;
-            $model = $entity::findOne([
-                'client_id' => Yii::$app->appSecurity->getEncrypted(Yii::$app->client->clientPublicKey),
-                'client_type' => $entity::TYPE_CLIENT,
-                'status' => $entity::STATUS_ACTIVE,
-            ]);
-
-            if (!$model) {
-                return false;
-            }
-
-            Yii::$app->client->clientPrivateKey = $model->private_key;
-            return true;
-        }
-
-        return false;
     }
 }
