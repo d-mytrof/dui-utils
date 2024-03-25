@@ -332,4 +332,33 @@ class DuiUtils
         }
         return is_readable($path) ? $alias : null;
     }
+    
+    /**
+     * @param int $length
+     * @param string $mask
+     * @return string
+     */
+    public static function renderUid(int $length = 4, string $mask = null): string
+    {
+        $characters = '0123456789';
+        $charactersLength = strlen($characters);
+        $randomString1 = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString1 .= $characters[rand(0, $charactersLength - 1)];
+        }
+        
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
+        $charactersLength = strlen($characters);
+        $randomString2 = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString2 .= $characters[rand(0, $charactersLength - 1)];
+        }
+
+        $time = str_replace([',', '.'], '-', time());
+        if ($mask) {
+            $randomString2 = $mask;
+        }
+
+        return $time . '-' .$randomString1 . '-' . $randomString2;
+    }
 }
