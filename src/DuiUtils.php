@@ -335,30 +335,27 @@ class DuiUtils
     
     /**
      * @param int $length
-     * @param string $mask
      * @return string
      */
-    public static function renderUid(int $length = 4, string $mask = null): string
+    public static function renderUid(int $length = 4): string
     {
-        $characters = '0123456789';
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
         $charactersLength = strlen($characters);
-        $randomString1 = '';
+        $randomString1 = $randomString2 = $randomString3 = $randomString4 = '';
+        
         for ($i = 0; $i < $length; $i++) {
             $randomString1 .= $characters[rand(0, $charactersLength - 1)];
         }
-        
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
-        $charactersLength = strlen($characters);
-        $randomString2 = '';
         for ($i = 0; $i < $length; $i++) {
             $randomString2 .= $characters[rand(0, $charactersLength - 1)];
         }
-
-        $time = str_replace([',', '.'], '-', time());
-        if ($mask) {
-            $randomString2 = $mask;
+        for ($i = 0; $i < $length; $i++) {
+            $randomString3 .= $characters[rand(0, $charactersLength - 1)];
         }
-
-        return $time . '-' .$randomString1 . '-' . $randomString2;
+        for ($i = 0; $i < $length; $i++) {
+            $randomString4 .= $characters[rand(0, $charactersLength - 1)];
+        }
+        
+        return $randomString1 . '-' . $randomString2 . '-' . $randomString3 . '-' . $randomString4;
     }
 }
