@@ -16,8 +16,11 @@ use yii\helpers\Json;
 class DuiHttpHybridClientBearerAuth extends BaseHttpBearerAuth
 {
     public $entityClassName = 'models\SystemClient';
+    public $defaultClientName;
     
     public const JWT_METHOD = 'HS256';
+    
+    public const CLIENT_ADMIN = 'admin';
     
     /**
      * {@inheritdoc}
@@ -48,12 +51,17 @@ class DuiHttpHybridClientBearerAuth extends BaseHttpBearerAuth
         }
         $bodyb64 = $tks[1];
         $json = Json::decode(base64_decode($bodyb64), false);
-        
         $entity = new $this->entityClassName;
-        $model = $entity::findOne([
+        $fields = [
             'client_id' => Yii::$app->appSecurity->getEncrypted($json->client_id),
             'status' => $entity::STATUS_ACTIVE,
-        ]);
+        ];
+        if ($this->defaultClientName) {
+            $fields = [
+                'name' => $this->defaultClientName
+            ];
+        }
+        $model = $entity::findOne($fields);
         if (!$model) {
             return null;
         }

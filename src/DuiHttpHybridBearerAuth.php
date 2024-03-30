@@ -18,8 +18,10 @@ class DuiHttpHybridBearerAuth extends BaseHttpBearerAuth
     public $entityClassName = 'models\SystemClient';
     public $identityClass;
     public $tokenEntityClassName;
+    public $defaultClientName;
     
     public const JWT_METHOD = 'HS256';
+    public const CLIENT_ADMIN = 'admin';
     
     /**
      * @param mixed $user
@@ -77,10 +79,16 @@ class DuiHttpHybridBearerAuth extends BaseHttpBearerAuth
         $json = Json::decode(base64_decode($bodyb64), false);
         
         $entity = new $this->entityClassName;
-        $model = $entity::findOne([
+        $fields = [
             'client_id' => Yii::$app->appSecurity->getEncrypted($json->client_id),
             'status' => $entity::STATUS_ACTIVE,
-        ]);
+        ];
+        if ($this->defaultClientName) {
+            $fields = [
+                'name' => $this->defaultClientName
+            ];
+        }
+        $model = $entity::findOne($fields);
         if (!$model) {
             return null;
         }
