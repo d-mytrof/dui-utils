@@ -110,6 +110,10 @@ class DuiHttpHybridBearerAuth extends BaseHttpBearerAuth
             $this->handleFailure($response);
         }
 
+        if ($decoded->uid !== $identity->uid) {
+            return null;
+        }
+        
         Yii::$app->user->setIdentity($identity);
 
         return $identity;

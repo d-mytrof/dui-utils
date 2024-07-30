@@ -141,7 +141,7 @@ class DuiUser extends \yii\web\User
         //create user directory
         if (!file_exists($userDirectory)) {
             $old = umask(0);
-            mkdir($userDirectory, Yii::$app->params['imageStorageDefaultPermissions'], true);
+            mkdir($userDirectory, DuiFileHelper::permissionsStringToOctal(Yii::$app->params['imageStorageDefaultPermissions']), true);
             umask($old);
         }
 

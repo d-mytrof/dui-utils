@@ -74,4 +74,26 @@ class DuiFileHelper
         }
         return $result;
     }
+    
+    /**
+     * @param string $value
+     * @return mixed
+     */
+    public static function permissionsStringToOctal(string $value): int
+    {
+        return match($value){
+            '0400' => 0400,
+            '0440' => 0440,
+            '0644' => 0644,
+            '0660' => 0660,
+            '0664' => 0664,
+            '0664' => 0664,
+            '0666' => 0666,
+            '0700' => 0700,
+            '0744' => 0744,
+            '0775' => 0775,
+            '0777' => 0777,
+            default => $value,
+        };
+    }
 }
