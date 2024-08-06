@@ -94,6 +94,7 @@ class DuiCaptchaWidget extends Widget
         $captcha->fontPath = $this->fontPath;
         return [
             'h' => Yii::$app->appSecurity->encodeCaptchaString($text),
+            'value' => $text,
             'image' => $captcha->renderCaptchaImageData($type),
         ];
     }
