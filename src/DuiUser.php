@@ -68,7 +68,7 @@ class DuiUser extends \yii\web\User
      */
     public function deleteImageFromStorage(string $path, string $uid)
     {
-        $filePath = Yii::$app->params['imageStoragePath'] . DIRECTORY_SEPARATOR . $uid.
+        $filePath = Yii::$app->settings->getParam('imageStoragePath') . DIRECTORY_SEPARATOR . $uid.
                 DIRECTORY_SEPARATOR. $path;
         if (is_writable($filePath)) {
             return unlink($filePath);
@@ -85,7 +85,7 @@ class DuiUser extends \yii\web\User
     public function imageExistsByUID($uid, $alias, $fileName)
     {
 
-        $url = Yii::$app->params['imageStoragePath'] . DIRECTORY_SEPARATOR .
+        $url = Yii::$app->settings->getParam('imageStoragePath') . DIRECTORY_SEPARATOR .
                 $uid . ($alias ? '/' . $alias : '') .
                 ($fileName ? '/' . $fileName : '');
 
@@ -103,7 +103,7 @@ class DuiUser extends \yii\web\User
     public function imageStoragePath(): ?string
     {
         if (!Yii::$app->user->isGuest) {
-            $path = Yii::$app->params['imageStoragePath'] .
+            $path = Yii::$app->settings->getParam('imageStoragePath') .
                     DIRECTORY_SEPARATOR . Yii::$app->user->identity->uid;
 
             if (is_readable($path)) {
@@ -122,8 +122,8 @@ class DuiUser extends \yii\web\User
     public function imageStorageBaseURL(string $fileName = null, string $uid = null): ?string
     {
         if (!empty($fileName)) {
-            return Yii::$app->params['imageStorageHostURL'] . '/' .
-                    Yii::$app->params['imageStorageURL'] . '/' . $uid.
+            return Yii::$app->settings->getParam('imageStorageHostURL') . '/' .
+                    Yii::$app->settings->getParam('imageStorageURL') . '/' . $uid.
                     '/'. $fileName;
         }
         return null;
@@ -136,12 +136,12 @@ class DuiUser extends \yii\web\User
      */
     public function createDirectories(string $uid): bool
     {
-        $userDirectory = Yii::$app->params['imageStoragePath'] . DIRECTORY_SEPARATOR . $uid;
+        $userDirectory = Yii::$app->settings->getParam('imageStoragePath') . DIRECTORY_SEPARATOR . $uid;
 
         //create user directory
         if (!file_exists($userDirectory)) {
             $old = umask(0);
-            mkdir($userDirectory, DuiFileHelper::permissionsStringToOctal(Yii::$app->params['imageStorageDefaultPermissions']), true);
+            mkdir($userDirectory, DuiFileHelper::permissionsStringToOctal(Yii::$app->settings->getParam('imageStorageDefaultPermissions')), true);
             umask($old);
         }
 
@@ -150,7 +150,7 @@ class DuiUser extends \yii\web\User
             return false;
         }
 
-        $directoriesCreate = Yii::$app->params['userSignupCreateDirectories'];
+        $directoriesCreate = Yii::$app->settings->getParam('userSignupCreateDirectories');
 
         //create other default directories
         for ($i = 0; $i < count($directoriesCreate); $i++) {

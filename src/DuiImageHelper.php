@@ -35,7 +35,7 @@ class DuiImageHelper
         string $alias
     ): mixed {
         $image = Image::getImagine()->open($filePath);
-        $koef = $image->getSize()->getWidth() / Yii::$app->params[$alias . 'PreviewWidth'];
+        $koef = $image->getSize()->getWidth() / Yii::$app->settings->getParam($alias . 'PreviewWidth');
         $coordX1 = floor($coordX1 * $koef);
         $coordY1 = floor($coordY1 * $koef);
         $coordX2 = floor($coordX2 * $koef);
@@ -67,8 +67,8 @@ class DuiImageHelper
             //resize to image size
             return $image->thumbnail(
                 new \Imagine\Image\Box(
-                    Yii::$app->params[$alias . 'Width'],
-                    Yii::$app->params[$alias . 'Height']
+                    Yii::$app->settings->getParam($alias . 'Width'),
+                    Yii::$app->settings->getParam($alias . 'Height')
                 ),
                 ManipulatorInterface::THUMBNAIL_FLAG_UPSCALE
             );

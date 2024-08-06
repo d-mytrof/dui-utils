@@ -40,7 +40,7 @@ class DuiConfig extends Component
      */
     public static function detectLanguage(): ?string
     {
-        $language = \Yii::$app->params['defaultLanguage'];
+        $language = Yii::$app->settings->getParam('defaultLanguage');
 
         if (!Yii::$app instanceof Application) {
             $lang = self::isLanguage(Yii::$app->request->get('language')) ?
@@ -57,8 +57,8 @@ class DuiConfig extends Component
             }
             if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                 $browserLanguage = locale_get_primary_language(locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']));
-                if (isset(\Yii::$app->params['availableLanguagesAliases'][$browserLanguage])) {
-                    $language = \Yii::$app->params['availableLanguagesAliases'][$browserLanguage];
+                if (isset(Yii::$app->settings->getParam('availableLanguagesAliases')[$browserLanguage])) {
+                    $language = Yii::$app->settings->getParam('availableLanguagesAliases')[$browserLanguage];
                 }
             }
         }
@@ -91,7 +91,7 @@ class DuiConfig extends Component
     public function getCountriesIds(): array
     {
         $data = [];
-        $list = \Yii::$app->params['availableCountries'];
+        $list = Yii::$app->settings->getParam('availableCountries');
         if (count($list)) {
             foreach ($list as $index => $item) {
                 $data[] = $index;
@@ -108,8 +108,8 @@ class DuiConfig extends Component
     public function getCitiesIds(int $countryID): array
     {
         $data = [];
-        $list = isset(\Yii::$app->params['availableCities'][$countryID]) ?
-                \Yii::$app->params['availableCities'][$countryID] : [];
+        $list = isset(Yii::$app->settings->getParam('availableCities')[$countryID]) ?
+                Yii::$app->settings->getParam('availableCities')[$countryID] : [];
         if (count($list)) {
             foreach ($list as $index => $item) {
                 $data[] = $item;
@@ -125,8 +125,8 @@ class DuiConfig extends Component
     public function getAvailableLanguagesList(int $countryID): ?array
     {
         $data = [];
-        if (isset(Yii::$app->params['availableCountries'][$countryID])) {
-            foreach (Yii::$app->params['availableCountries'][$countryID]['availableLanguages'] as $key => $value) {
+        if (isset(Yii::$app->settings->getParam('availableCountries')[$countryID])) {
+            foreach (Yii::$app->settings->getParam('availableCountries')[$countryID]['availableLanguages'] as $key => $value) {
                 $data[$key] = Yii::t('basic', $value);
             }
         }
