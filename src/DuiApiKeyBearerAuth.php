@@ -5,7 +5,7 @@
  * @version 1.0.0
  */
 
-namespace dmytrof\utils;
+namespace components;
 
 use Yii;
 use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
@@ -18,8 +18,24 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
     public const JWT_METHOD = 'HS256';
     
     public $entityClassName = 'models\ApiKeyClient';
+    public $identityClass;
+    public $tokenEntityClassName;
     
     private $jwtToken = null;
+    
+    /**
+     * @param mixed $user
+     * @return void
+     */
+    private function setParams(mixed $user): void
+    {
+        if (!empty($this->identityClass)) {
+            $user->identityClass = $this->identityClass;
+        }
+        if (!empty($this->tokenEntityClassName)) {
+            $user->tokenEntityClassName = $this->tokenEntityClassName;
+        }
+    }
 
     private function getApiKey(mixed $request): mixed
     {
@@ -74,6 +90,7 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
      */
     public function authenticate($user, $request, $response)
     {
+        $this->setParams($user);
         $model = $this->getApiKey($request);
 
         if (!$model) {

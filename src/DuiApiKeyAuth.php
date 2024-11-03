@@ -16,6 +16,11 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
     private function getApiKey(mixed $request): mixed
     {
         $authHeader = $request->getHeaders()->get('X-API-Key');
+        
+        if(!$authHeader) {
+            return null;
+        }
+        
         $entity = new $this->entityClassName;
         $model = $entity::find()
         ->where([
@@ -45,7 +50,7 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
         if (!$model) {
             return null;
         }
-        
+
         $model->api_key = null;
         $model->new_api_key = null;
         $model->public_key = null;
