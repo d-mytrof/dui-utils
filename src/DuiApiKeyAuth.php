@@ -11,7 +11,9 @@ use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
 
 class DuiApiKeyAuth extends BaseHttpBearerAuth
 {
-    public $entityClassName = 'models\ApiKeyClient';
+    public string $entityClassName = 'models\ApiKeyClient';
+    
+    public array $apiKeyClients = [];
 
     private function getApiKey(mixed $request): mixed
     {
@@ -34,6 +36,10 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
         ->one();
         
         if (!$model) {
+            return null;
+        }
+        
+        if (!empty($this->apiKeyClients) && !in_array($model->name, $this->apiKeyClients)) {
             return null;
         }
 

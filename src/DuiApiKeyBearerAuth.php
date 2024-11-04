@@ -17,9 +17,10 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
 {
     public const JWT_METHOD = 'HS256';
     
-    public $entityClassName = 'models\ApiKeyClient';
-    public $identityClass;
-    public $tokenEntityClassName;
+    public string $entityClassName = 'models\ApiKeyClient';
+    public ?string $identityClass;
+    public ?string $tokenEntityClassName;
+    public array $apiKeyClients = [];
     
     private $jwtToken = null;
     
@@ -37,6 +38,10 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         }
     }
 
+    /**
+     * @param mixed $request
+     * @return mixed
+     */
     private function getApiKey(mixed $request): mixed
     {
         $authHeader = $request->getHeaders()->get('X-API-Key');
@@ -58,6 +63,10 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         ->one();
         
         if (!$model) {
+            return null;
+        }
+        
+        if (!empty($this->apiKeyClients) && !in_array($model->name, $this->apiKeyClients)) {
             return null;
         }
 
