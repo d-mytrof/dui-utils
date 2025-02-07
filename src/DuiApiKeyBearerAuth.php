@@ -11,11 +11,10 @@ use Yii;
 use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use yii\helpers\Json;
 
 class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
 {
-    public const JWT_METHOD = 'HS256';
+    public const JWT_METHOD = 'RS256';
     
     public string $entityClassName = 'models\ApiKeyClient';
     public ?string $identityClass;
@@ -111,19 +110,15 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         if (!$jwt) {
             return null;
         }
-
-        $tks = explode('.', $jwt);
-        if (count($tks) !== 3) {
-            return null;
-        }
-        $bodyb64 = $tks[1];
-        $json = Json::decode(base64_decode($bodyb64), false);
         
         $entity = new $this->entityClassName;
         $auth = $entity::findOne(['name' => $entity::CLIENT_AUTH]);
+        if (!$auth) {
+            return null;
+        }
 
         try {
-            $decoded = JWT::decode($jwt, new Key($auth->private_key, self::JWT_METHOD));
+            $decoded = JWT::decode($jwt, new Key($auth->public_key, self::JWT_METHOD));
         } catch (\Exception $e) {
             return null;
         }

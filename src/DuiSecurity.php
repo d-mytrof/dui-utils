@@ -18,7 +18,8 @@ use Firebase\JWT\Key;
 
 class DuiSecurity extends Component
 {
-    public const JWT_METHOD = 'HS256';
+    public const JWT_METHOD = 'RS256';
+    public const DEFAULT_AUTH_SERVICE_NAME = 'auth';
     
     public $passwordSalt;
             
@@ -170,6 +171,33 @@ class DuiSecurity extends Component
     }
     
     /**
+     * @param int $keySize
+     * @return array
+     */
+    public function generateKeyPair(int $keySize = 512): array
+    {
+        $config = [
+            "private_key_bits" => $keySize,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        ];
+
+        $res = openssl_pkey_new($config);
+        openssl_pkey_export($res, $privateKey);
+        $publicKeyDetails = openssl_pkey_get_details($res);
+        $publicKey = $publicKeyDetails["key"];
+
+        return ['private' => $privateKey, 'public' => $publicKey];
+    }
+    
+    /**
+     * @return string
+     */
+    public function getAuthServiceName(): string
+    {
+        return self::DEFAULT_AUTH_SERVICE_NAME;
+    }
+    
+    /**
      * @param string $jwt
      * @param string $encodeMethod
      * @return array|null
@@ -195,28 +223,21 @@ class DuiSecurity extends Component
             return null;
         }
 
-        $tks = explode('.', $jwt);
-        if (count($tks) !== 3) {
-            return null;
-        }
-        $bodyb64 = $tks[1];
-        $json = Json::decode(base64_decode($bodyb64), false);
-        
         $entity = new $this->entityClassName;
         $model = $entity::findOne([
-            'client_id' => Yii::$app->appSecurity->getEncrypted($json->client_id),
+            'name' => $this->getAuthServiceName(),
             'status' => $entity::STATUS_ACTIVE,
         ]);
         if (!$model) {
             return null;
         }
 
-        try {
-            $params = JWT::decode($jwt, new Key($model->private_key, $encodeMethod ? $encodeMethod : self::JWT_METHOD));
-        } catch (\Exception $e) {
-            return null;
-        }
+        $decoded = JWT::decode($jwt, new Key($model->public_key, self::JWT_METHOD));
 
-        return (array)$params;
+        if ($decoded->client_name === $this->getAuthServiceName()) {
+            return (array)$decoded;
+        }
+        
+        return null;
     }
 }
