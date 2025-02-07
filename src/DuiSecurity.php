@@ -232,7 +232,11 @@ class DuiSecurity extends Component
             return null;
         }
 
-        $decoded = JWT::decode($jwt, new Key($model->public_key, self::JWT_METHOD));
+        try {
+            $decoded = JWT::decode($jwt, new Key($model->public_key, self::JWT_METHOD));
+        } catch (Exception $ex) {
+            return null;
+        }
 
         if ($decoded->client_name === $this->getAuthServiceName()) {
             return (array)$decoded;
