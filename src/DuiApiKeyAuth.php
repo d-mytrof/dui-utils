@@ -8,12 +8,18 @@
 namespace dmytrof\utils;
 
 use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class DuiApiKeyAuth extends BaseHttpBearerAuth
 {
+    public const JWT_METHOD = 'RS256';
+    
     public string $entityClassName = 'models\ApiKeyClient';
     
     public array $apiKeyClients = [];
+    
+    public bool $validateToken = false;
 
     private function getApiKey(mixed $request): mixed
     {
@@ -47,6 +53,28 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
     }
     
     /**
+     * @param mixed $request
+     * @return string|null
+     */
+    private function getGwt(mixed $request): ?string
+    {
+        $jwtToken = null;
+        $authHeader = $request->getHeaders()->get($this->header);
+        $pattern = '/^Bearer\s+(.*?)$/';
+        if ($authHeader !== null) {
+            if ($pattern !== null) {
+                if (preg_match($pattern, $authHeader, $matches)) {
+                    $jwtToken = $matches[1];
+                } else {
+                    return null;
+                }
+            }
+        }
+        
+        return $jwtToken;
+    }
+    
+    /**
      * {@inheritdoc}
      */
     public function authenticate($user, $request, $response)
@@ -55,6 +83,30 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
 
         if (!$model) {
             return null;
+        }
+
+        $entity = new $this->entityClassName;
+        $auth = $entity::findOne(['name' => $entity::CLIENT_AUTH]);
+        if (!$auth) {
+            return null;
+        }
+        
+        if ($this->validateToken) {
+            $jwtToken = $this->getGwt($request);
+
+            if (!$jwtToken) {
+                return null;
+            }
+
+            try {
+                $decoded = JWT::decode($jwtToken, new Key($auth->public_key, self::JWT_METHOD));
+            } catch (\Exception $e) {
+                return null;
+            }
+
+            if ($decoded->client_name !== $entity::CLIENT_AUTH) {
+                return null;
+            }
         }
 
         $model->api_key = null;
