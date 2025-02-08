@@ -94,7 +94,7 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
         if ($this->validateToken) {
             $jwtToken = $this->getGwt($request);
 
-            if (!$jwtToken) {
+            if (!$jwtToken || !$auth->public_key) {
                 return null;
             }
 
