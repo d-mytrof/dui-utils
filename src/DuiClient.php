@@ -19,7 +19,7 @@ class DuiClient extends Component
     public const SHA_ENCRYPTION_ALGO = 'sha256';
     public const SHA_LENGTH = 32;
     public const TOKEN_DATA_ITEMS_COUNT = 2;
-    public const HEADER_CLIENT_ID = 'X-Api-Client';
+    public const HEADER_X_API_KEY = 'X-API-Key';
     public const HEADER_AUTHORIZATION = 'Authorization';
     public const HEADER_BEARER = 'Bearer';
     public const HEADER_ACCEPT = 'Accept';
@@ -40,6 +40,7 @@ class DuiClient extends Component
     public $systemPrivateKey;
     
     public $entityClassName;
+    public $xApiKey;
 
 
     /**
@@ -143,6 +144,7 @@ class DuiClient extends Component
 
             $response = $request->setFormat(Client::FORMAT_JSON)
                     ->setHeaders([
+                        self::HEADER_X_API_KEY => $this->xApiKey,
                         self::HEADER_ACCEPT => $this->headerAccept,
                         self::HEADER_CONTENT_TYPE => $this->headerContentType,
                         self::HEADER_AUTHORIZATION => !empty($this->headerAuthorization) ?
