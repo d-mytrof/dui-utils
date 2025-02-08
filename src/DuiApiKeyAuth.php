@@ -7,9 +7,11 @@
 
 namespace dmytrof\utils;
 
+use Yii;
 use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use yii\web\UnauthorizedHttpException;
 
 class DuiApiKeyAuth extends BaseHttpBearerAuth
 {
@@ -94,8 +96,12 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
         if ($this->validateToken) {
             $jwtToken = $this->getGwt($request);
 
-            if (!$jwtToken || !$auth->public_key) {
+            if (!$jwtToken) {
                 return null;
+            }
+            
+            if (!$auth->public_key) {
+                throw new UnauthorizedHttpException(Yii::t('basic', 'AUTH_KEY_REQUIRED'));
             }
 
             try {
