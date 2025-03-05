@@ -5,7 +5,7 @@
  * Email: dmitrof.development@gmail.com
  */
 
-namespace components;
+namespace dmytrof\utils;
 
 use Yii;
 use yii\base\ActionFilter;
