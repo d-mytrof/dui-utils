@@ -67,7 +67,7 @@ class DuiFileHelper
     {
         $result = [];
         if (is_readable($filePath) && ($open = fopen($filePath, 'r')) !== false) {
-            while (($data = fgetcsv($open, 5000, ',')) !== false) {
+            while (($data = fgetcsv($open, 5000, ';')) !== false) {
                 $result[] = $data;
             }
             fclose($open);
