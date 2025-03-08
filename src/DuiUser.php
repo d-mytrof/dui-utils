@@ -122,9 +122,7 @@ class DuiUser extends \yii\web\User
     public function imageStorageBaseURL(string $fileName = null, string $uid = null): ?string
     {
         if (!empty($fileName)) {
-            return Yii::$app->settings->getParam('imageStorageHostURL') . '/' .
-                    Yii::$app->settings->getParam('imageStorageURL') . '/' . $uid.
-                    '/'. $fileName;
+            return Yii::$app->settings->getParam('imageStorageHostURL') . '/' . $uid. '/'. $fileName;
         }
         return null;
     }
