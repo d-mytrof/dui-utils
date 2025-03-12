@@ -49,10 +49,10 @@ class DuiRateLimiter extends ActionFilter
     }
 
     /**
-     * @param type $userIdentifierKeyFromBody
-     * @return string
+     * @param string|null $userIdentifierKeyFromBody
+     * @return string|null
      */
-    private function getRateLimitKey($userIdentifierKeyFromBody): string
+    private function getRateLimitKey(?string $userIdentifierKeyFromBody): ?string
     {
         if ($userIdentifierKeyFromBody && Yii::$app->request->getBodyParam($userIdentifierKeyFromBody)) {
             return Yii::$app->request->getBodyParam($userIdentifierKeyFromBody);
