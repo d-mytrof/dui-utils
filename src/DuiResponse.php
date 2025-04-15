@@ -15,16 +15,6 @@ class DuiResponse extends \yii\web\Response
 
     public static function getBeforeSend($event)
     {
-        Yii::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Origin', '*');
-        Yii::$app->getResponse()->getHeaders()->set('Origin', '*');
-        Yii::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Credentials', 'true');
-        Yii::$app->getResponse()->getHeaders()->set(
-            'Access-Control-Allow-Headers',
-            'Origin, Content-Type, Accept, Lang, Authorization, X-Requested-With'
-        );
-        Yii::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS');
-        Yii::$app->getResponse()->getHeaders()->set('Access-Control-Max-Age', '86400');
-
         $response = $event->sender;
         $result = [];
 
