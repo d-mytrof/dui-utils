@@ -27,7 +27,7 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
 
     private function getApiKey(mixed $request): mixed
     {
-        $authHeader = $request->getHeaders()->get('X-API-Key');
+        $authHeader = $request->getHeaders()->get('x-api-key');
         
         if (!$authHeader) {
             $authHeader = $request->cookies->get('x-api-key');
