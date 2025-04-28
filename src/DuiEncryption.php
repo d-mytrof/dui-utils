@@ -7,6 +7,8 @@
 
 namespace dmytrof\utils;
 
+use Exception;
+
 /**
  * Class for encryption/decryption
  */
@@ -15,14 +17,11 @@ class DuiEncryption
     private static string $secretKey;
     private static string $ivSecret;
 
-    public static function init(): void
+    public static function encrypt(string $plainText): string
     {
         self::$secretKey = getenv('SECURITY_COOKIE_SECRET_KEY');
         self::$ivSecret = getenv('SECURITY_COOKIE_IV_SECRET');
-    }
-
-    public static function encrypt(string $plainText): string
-    {
+        
         if (empty(self::$secretKey)) {
             throw new Exception('Encryption key is not set.');
         }
@@ -39,6 +38,9 @@ class DuiEncryption
 
     public static function decrypt(string $encryptedText): string
     {
+        self::$secretKey = getenv('SECURITY_COOKIE_SECRET_KEY');
+        self::$ivSecret = getenv('SECURITY_COOKIE_IV_SECRET');
+        
         if (empty(self::$secretKey)) {
             throw new Exception('Decryption key is not set.');
         }
