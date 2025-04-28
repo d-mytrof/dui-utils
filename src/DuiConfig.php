@@ -9,6 +9,7 @@ namespace dmytrof\utils;
 
 use Yii;
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
 
 class DuiConfig extends Component
 {
@@ -108,11 +109,11 @@ class DuiConfig extends Component
     public function getCitiesIds(int $countryID): array
     {
         $data = [];
-        $list = isset(Yii::$app->settings->getParam('availableCities')[$countryID]) ?
-                Yii::$app->settings->getParam('availableCities')[$countryID] : [];
+        $list = Yii::$app->settings->getParam('availableCountries');
+        $list = ArrayHelper::getValue($list, $countryID . '.availableCities');
         if (count($list)) {
             foreach ($list as $index => $item) {
-                $data[] = $item;
+                $data[] = $index;
             }
         }
         return $data;
