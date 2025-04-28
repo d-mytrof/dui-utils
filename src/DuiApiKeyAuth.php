@@ -12,6 +12,8 @@ use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use yii\web\UnauthorizedHttpException;
+use Exception;
+use dmytrof\utils\DuiEncryption;
 
 class DuiApiKeyAuth extends BaseHttpBearerAuth
 {
@@ -26,6 +28,18 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
     private function getApiKey(mixed $request): mixed
     {
         $authHeader = $request->getHeaders()->get('X-API-Key');
+        
+        if (!$authHeader) {
+            $authHeader = $request->cookies->get('x-api-key');
+
+            if ($authHeader) {
+                try {
+                    $authHeader = DuiEncryption::decrypt($authHeader);
+                } catch (Exception $e) {
+                    return null;
+                }
+            }
+        }
         
         if(!$authHeader) {
             return null;
