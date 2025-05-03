@@ -15,6 +15,7 @@ class DuiAccessRule extends \yii\filters\AccessRule
         if (empty($this->roles)) {
             return true;
         }
+        
         foreach ($this->roles as $role) {
             if ($role === '?') {
                 if ($user->getIsGuest()) {
@@ -25,7 +26,7 @@ class DuiAccessRule extends \yii\filters\AccessRule
                     return true;
                 }
                 //check if the user is logged in and the roles match
-            } elseif (!$user->getIsGuest() && $role === $user->identity->role_id) {
+            } elseif (!$user->getIsGuest() && in_array ($role, $user->identity->getGroupUuids())) {
                 return true;
             }
         }
