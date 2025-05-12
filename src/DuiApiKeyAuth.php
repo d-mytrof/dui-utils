@@ -34,7 +34,7 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
 
             if ($authHeader) {
                 try {
-                    $authHeader = DuiEncryption::decrypt($authHeader);
+                    $authHeader = (new DuiEncryption)->decrypt($authHeader);
                 } catch (Exception $e) {
                     return null;
                 }
