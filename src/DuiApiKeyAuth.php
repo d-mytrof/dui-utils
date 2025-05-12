@@ -13,7 +13,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use yii\web\UnauthorizedHttpException;
 use Exception;
-use dmytrof\utils\DuiEncryption;
+use dmytrof\DuiBucketSDK\Helpers\DuiEncryption;
 
 class DuiApiKeyAuth extends BaseHttpBearerAuth
 {

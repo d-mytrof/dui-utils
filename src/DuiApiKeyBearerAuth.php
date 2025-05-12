@@ -11,6 +11,7 @@ use Yii;
 use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use dmytrof\DuiBucketSDK\Helpers\DuiEncryption;
 
 class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
 {
