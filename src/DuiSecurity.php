@@ -24,7 +24,6 @@ class DuiSecurity extends Component
     public $passwordSalt;
             
     public $tokenSecretKey;
-    public $tokenLifetime;
 
     public $refreshTokenLifetime;
 
