@@ -25,6 +25,8 @@ class DuiSecurity extends Component
             
     public $tokenSecretKey;
 
+    public $tokenLifetime;
+
     public $refreshTokenLifetime;
 
     public $captchaHashData;
