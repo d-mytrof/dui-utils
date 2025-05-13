@@ -16,14 +16,14 @@ use dmytrof\DuiBucketSDK\Helpers\DuiEncryption;
 class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
 {
     public const JWT_METHOD = 'RS256';
-    
+
     public string $entityClassName = 'models\ApiKeyClient';
     public ?string $identityClass;
     public ?string $tokenEntityClassName;
     public array $apiKeyClients = [];
-    
+
     private $jwtToken = null;
-    
+
     /**
      * @param mixed $user
      * @return void
@@ -45,7 +45,7 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
     private function getApiKey(mixed $request): mixed
     {
         $authHeader = $request->getHeaders()->get('x-api-key');
-        
+
         if (!$authHeader) {
             $authHeader = $request->cookies->get('x-api-key');
 
@@ -57,34 +57,34 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
                 }
             }
         }
-        
+
         if(!$authHeader) {
             return null;
         }
-        
+
         $entity = new $this->entityClassName;
         $model = $entity::find()
-        ->where([
-            'status' => $entity::STATUS_ACTIVE,
-        ])
-        ->andWhere([
-            'or',
-            ['api_key' => $authHeader],
-            ['new_api_key' => $authHeader]
-        ])
-        ->one();
-        
+            ->where([
+                'status' => $entity::STATUS_ACTIVE,
+            ])
+            ->andWhere([
+                'or',
+                ['api_key' => $authHeader],
+                ['new_api_key' => $authHeader]
+            ])
+            ->one();
+
         if (!$model) {
             return null;
         }
-        
+
         if (!empty($this->apiKeyClients) && !in_array($model->name, $this->apiKeyClients)) {
             return null;
         }
 
         return $model;
     }
-    
+
     /**
      * @param mixed $request
      * @return string|null
@@ -102,10 +102,10 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
                 }
             }
         }
-        
+
         return $this->jwtToken;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -117,13 +117,13 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         if (!$model) {
             return null;
         }
-        
+
         $jwt = $this->getGwt($request);
 
         if (!$jwt) {
             return null;
         }
-        
+
         $entity = new $this->entityClassName;
         $auth = $entity::findOne(['name' => $entity::CLIENT_AUTH]);
         if (!$auth) {
@@ -136,17 +136,17 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
             return null;
         }
 
-        if ($decoded->client_name !== $entity::CLIENT_AUTH || empty($this->jwtToken)) {
+        if ($decoded->client_name !== $entity::CLIENT_AUTH || empty($this->jwtToken) || empty($decoded->uid)) {
             return null;
         }
 
-        $identity = $user->findByAccessToken($this->jwtToken);
-
+        $identityClass = $user->identityClass;
+        $identity = $identityClass::findByUID($decoded->uid);
         if ($identity === null) {
             $this->challenge($response);
             $this->handleFailure($response);
         }
-        
+
         Yii::$app->user->setIdentity($identity);
 
         return $identity;
