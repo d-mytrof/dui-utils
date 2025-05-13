@@ -31,7 +31,7 @@ class DuiRateLimiter extends ActionFilter
 
         $db->createCommand("DELETE FROM rate_limits WHERE created_at < :limitTime", [':limitTime' => $limitTime])->execute();
 
-        $requestCount = $db->createCommand("SELECT COUNT(*) FROM rate_limits WHERE user_identifier = :key AND action = :action", [
+        $requestCount = $db->createCommand("SELECT COUNT(*) FROM rate_limits WHERE uid = :key AND action = :action", [
             ':key' => $key,
             ':action' => $action->id
         ])->queryScalar();
@@ -41,7 +41,7 @@ class DuiRateLimiter extends ActionFilter
         }
 
         $db->createCommand()->insert('rate_limits', [
-            'user_identifier' => $key,
+            'uid' => $key,
             'action' => $action->id,
         ])->execute();
 
