@@ -23,7 +23,7 @@ class DuiUser extends \yii\web\User
     {
         $entity = new $this->tokenEntityClassName;
         $model = $entity::find()
-            ->where(['=', 'token', $token])
+            ->where(['=', 'refresh_token', $token])
             ->andWhere(['>', 'expired_at', time()])
             ->one();
 
