@@ -12,6 +12,7 @@ use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use dmytrof\DuiBucketSDK\Helpers\DuiEncryption;
+use yii\web\UnauthorizedHttpException;
 
 class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
 {
@@ -59,7 +60,7 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         }
 
         if(!$authHeader) {
-            return null;
+            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         $entity = new $this->entityClassName;
@@ -75,11 +76,11 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
             ->one();
 
         if (!$model) {
-            return null;
+            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         if (!empty($this->apiKeyClients) && !in_array($model->name, $this->apiKeyClients)) {
-            return null;
+            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         return $model;
@@ -115,7 +116,7 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         $model = $this->getApiKey($request);
 
         if (!$model) {
-            return null;
+            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         $jwt = $this->getGwt($request);
@@ -127,7 +128,7 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         $entity = new $this->entityClassName;
         $auth = $entity::findOne(['name' => $entity::CLIENT_AUTH]);
         if (!$auth) {
-            return null;
+            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         try {

@@ -18,17 +18,17 @@ use dmytrof\DuiBucketSDK\Helpers\DuiEncryption;
 class DuiApiKeyAuth extends BaseHttpBearerAuth
 {
     public const JWT_METHOD = 'RS256';
-    
+
     public string $entityClassName = 'models\ApiKeyClient';
-    
+
     public array $apiKeyClients = [];
-    
+
     public bool $validateToken = false;
 
     private function getApiKey(mixed $request): mixed
     {
         $authHeader = $request->getHeaders()->get('x-api-key');
-        
+
         if (!$authHeader) {
             $authHeader = $request->cookies->get('x-api-key');
 
@@ -40,34 +40,34 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
                 }
             }
         }
-        
+
         if(!$authHeader) {
-            return null;
+            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
-        
+
         $entity = new $this->entityClassName;
         $model = $entity::find()
-        ->where([
-            'status' => $entity::STATUS_ACTIVE,
-        ])
-        ->andWhere([
-            'or',
-            ['api_key' => $authHeader],
-            ['new_api_key' => $authHeader]
-        ])
-        ->one();
-        
+            ->where([
+                'status' => $entity::STATUS_ACTIVE,
+            ])
+            ->andWhere([
+                'or',
+                ['api_key' => $authHeader],
+                ['new_api_key' => $authHeader]
+            ])
+            ->one();
+
         if (!$model) {
-            return null;
+            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
-        
+
         if (!empty($this->apiKeyClients) && !in_array($model->name, $this->apiKeyClients)) {
-            return null;
+            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         return $model;
     }
-    
+
     /**
      * @param mixed $request
      * @return string|null
@@ -86,10 +86,10 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
                 }
             }
         }
-        
+
         return $jwtToken;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -106,14 +106,14 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
         if (!$auth) {
             return null;
         }
-        
+
         if ($this->validateToken) {
             $jwtToken = $this->getGwt($request);
 
             if (!$jwtToken) {
                 return null;
             }
-            
+
             if (!$auth->public_key) {
                 throw new UnauthorizedHttpException(Yii::t('basic', 'AUTH_KEY_REQUIRED'));
             }

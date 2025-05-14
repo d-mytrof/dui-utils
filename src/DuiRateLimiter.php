@@ -24,7 +24,7 @@ class DuiRateLimiter extends ActionFilter
         }
 
         $userIdentifierKeyFromBody = $this->actions[$action->id];
-        
+
         $db = Yii::$app->db;
         $key = $this->getRateLimitKey($userIdentifierKeyFromBody);
         $limitTime = date('Y-m-d H:i:s', time() - $this->interval);
@@ -39,11 +39,12 @@ class DuiRateLimiter extends ActionFilter
         if ($requestCount >= $this->maxRequests) {
             throw new TooManyRequestsHttpException(Yii::t('basic', 'RATE_LIMIT'));
         }
-
-        $db->createCommand()->insert('rate_limits', [
-            'uid' => $key,
-            'action' => $action->id,
-        ])->execute();
+        if ($key) {
+            $db->createCommand()->insert('rate_limits', [
+                'uid' => $key,
+                'action' => $action->id,
+            ])->execute();
+        }
 
         return parent::beforeAction($action);
     }
@@ -57,7 +58,7 @@ class DuiRateLimiter extends ActionFilter
         if ($userIdentifierKeyFromBody && Yii::$app->request->getBodyParam($userIdentifierKeyFromBody)) {
             return Yii::$app->request->getBodyParam($userIdentifierKeyFromBody);
         }
-        
+
         return Yii::$app->user->id ?? Yii::$app->request->userIP;
     }
 }
