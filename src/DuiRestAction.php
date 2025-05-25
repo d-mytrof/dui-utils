@@ -30,10 +30,10 @@ abstract class DuiRestAction extends Action
 
     /**
      * @param mixed $dataProvider
-     * @param int $currentPage
+     * @param int $page
      * @return array
      */
-    public function getDataProviderResponse(mixed $dataProvider, int $currentPage = null): array
+    public function getDataProviderResponse(mixed $dataProvider, int $page = null): array
     {
         $total = $dataProvider->totalCount;
         $perPage = $dataProvider->pagination ? $dataProvider->pagination->pageSize : null;
@@ -41,9 +41,9 @@ abstract class DuiRestAction extends Action
         if ($perPage) {
             $this->response['data']['pageCount'] = ceil($total / $perPage);
             $this->response['data']['perPage'] = $perPage;
-            $this->response['data']['currentPage'] = $dataProvider->pagination->page + 1;
-            if ($currentPage) {
-                $this->response['data']['currentPage'] = $currentPage;
+            $this->response['data']['page'] = $dataProvider->pagination->page + 1;
+            if ($page) {
+                $this->response['data']['page'] = $page;
             }
         }
         $this->response['data']['total'] = $total;

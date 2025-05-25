@@ -44,8 +44,8 @@ class DuiResponse extends \yii\web\Response
                 $result = array_merge($result, ['pageCount' => $response->data['pageCount']]);
             }
 
-            if (isset($response->data['currentPage'])) {
-                $result = array_merge($result, ['currentPage' => $response->data['currentPage']]);
+            if (isset($response->data['page'])) {
+                $result = array_merge($result, ['page' => $response->data['page']]);
             }
 
             if (isset($response->data['perPage'])) {
