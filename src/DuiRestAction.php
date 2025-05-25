@@ -37,7 +37,7 @@ abstract class DuiRestAction extends Action
     {
         $total = $dataProvider->totalCount;
         $perPage = $dataProvider->pagination ? $dataProvider->pagination->pageSize : null;
-        $this->response['data']['result'] = $dataProvider;
+        $this->response['data']['items'] = $dataProvider;
         if ($perPage) {
             $this->response['data']['pageCount'] = ceil($total / $perPage);
             $this->response['data']['perPage'] = $perPage;
