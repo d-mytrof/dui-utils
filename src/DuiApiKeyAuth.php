@@ -11,7 +11,7 @@ use Yii;
 use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use yii\web\UnauthorizedHttpException;
+use yii\web\ForbiddenHttpException;
 use Exception;
 use dmytrof\DuiBucketSDK\Helpers\DuiEncryption;
 
@@ -42,7 +42,7 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
         }
 
         if(!$authHeader) {
-            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
+            throw new ForbiddenHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         $entity = new $this->entityClassName;
@@ -58,11 +58,11 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
             ->one();
 
         if (!$model) {
-            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
+            throw new ForbiddenHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         if (!empty($this->apiKeyClients) && !in_array($model->name, $this->apiKeyClients)) {
-            throw new UnauthorizedHttpException(Yii::t('basic', 'API_INVALID_KEY'));
+            throw new ForbiddenHttpException(Yii::t('basic', 'API_INVALID_KEY'));
         }
 
         return $model;
@@ -115,7 +115,7 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
             }
 
             if (!$auth->public_key) {
-                throw new UnauthorizedHttpException(Yii::t('basic', 'AUTH_KEY_REQUIRED'));
+                throw new ForbiddenHttpException(Yii::t('basic', 'AUTH_KEY_REQUIRED'));
             }
 
             try {
