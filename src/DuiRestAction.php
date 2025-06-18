@@ -30,22 +30,34 @@ abstract class DuiRestAction extends Action
 
     /**
      * @param mixed $dataProvider
-     * @param int $page
      * @return array
      */
-    public function getDataProviderResponse(mixed $dataProvider, int $page = null): array
+    public function getDataProviderResponse(mixed $dataProvider): array
     {
         $total = $dataProvider->totalCount;
         $perPage = $dataProvider->pagination ? $dataProvider->pagination->pageSize : null;
+
         $this->response['data']['items'] = $dataProvider;
+
         if ($perPage) {
-            $this->response['data']['pageCount'] = ceil($total / $perPage);
-            $this->response['data']['perPage'] = $perPage;
-            $this->response['data']['page'] = $dataProvider->pagination->page + 1;
-            if ($page) {
-                $this->response['data']['page'] = $page;
+            $totalPages = ceil($total / $perPage);
+            $currentPage = $dataProvider->pagination->page + 1;
+
+            if ($currentPage > $totalPages && $totalPages > 0) {
+                $this->response['data']['items'] = [];
+                $this->response['data']['pageCount'] = $totalPages;
+                $this->response['data']['perPage'] = $perPage;
+                $this->response['data']['page'] = $currentPage;
+                $this->response['data']['total'] = $total;
+
+                return $this->response;
             }
+
+            $this->response['data']['pageCount'] = $totalPages;
+            $this->response['data']['perPage'] = $perPage;
+            $this->response['data']['page'] = $currentPage;
         }
+
         $this->response['data']['total'] = $total;
 
         return $this->response;
