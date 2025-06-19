@@ -1,12 +1,13 @@
 <?php
 /**
- * @copyright Copyright © 2024 Dmytro Mytrofanov
+ * @copyright Copyright © 2025 Dmytro Mytrofanov
  * @package dui-utils
  * @version 1.0.0
  */
 
 namespace dmytrof\utils;
 
+use components\Exception;
 use Yii;
 use yii\filters\auth\HttpBearerAuth as BaseHttpBearerAuth;
 use Firebase\JWT\JWT;
@@ -14,14 +15,13 @@ use Firebase\JWT\Key;
 use dmytrof\DuiBucketSDK\Helpers\DuiEncryption;
 use yii\web\ForbiddenHttpException;
 
-class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
+class DuiAuthBearer extends BaseHttpBearerAuth
 {
     public const JWT_METHOD = 'RS256';
 
     public string $entityClassName = 'models\ApiKeyClient';
     public ?string $identityClass;
-    public ?string $tokenEntityClassName;
-    public array $apiKeyClients = [];
+    public array $userGroups = [];
 
     private $jwtToken = null;
 
@@ -33,9 +33,6 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
     {
         if (!empty($this->identityClass)) {
             $user->identityClass = $this->identityClass;
-        }
-        if (!empty($this->tokenEntityClassName)) {
-            $user->tokenEntityClassName = $this->tokenEntityClassName;
         }
     }
 
@@ -111,10 +108,6 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         $this->setParams($user);
         $model = $this->getApiKey($request);
 
-        if (!$model) {
-            throw new ForbiddenHttpException(Yii::t('basic', 'API_INVALID_KEY'));
-        }
-
         $jwt = $this->getGwt($request);
 
         if (!$jwt) {
@@ -133,17 +126,23 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
             return null;
         }
 
-        if ($decoded->client_name !== $entity::CLIENT_AUTH || empty($this->jwtToken) || empty($decoded->uid)) {
+        if ($decoded->client_name !== $entity::CLIENT_AUTH || empty($this->jwtToken) || empty($decoded->uid) || empty($decoded->groups)) {
             return null;
         }
 
-        $identityClass = $user->identityClass;
-        $identity = $identityClass::findByUID($decoded->uid);
+        $common = array_intersect($decoded->groups, $this->userGroups);
+        if (empty($common)) {
+            return null;
+        }
+
+        $identity = new $user->identityClass;
+        $identity->uid = $decoded->uid;
+        $identity->groups = $decoded->groups;
         if ($identity === null) {
             $this->challenge($response);
             $this->handleFailure($response);
         }
-
+;
         Yii::$app->user->setIdentity($identity);
 
         return $identity;
