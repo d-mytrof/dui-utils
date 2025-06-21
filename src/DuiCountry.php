@@ -9,6 +9,7 @@ namespace dmytrof\utils;
 
 use Yii;
 use yii\base\Component;
+use Locale;
 
 class DuiCountry extends Component
 {
@@ -387,27 +388,49 @@ class DuiCountry extends Component
         return $value;
     }
 
-    public static function localeToLanguage(string $value)
+    public static function localeToLanguage(?string $value): ?string
     {
-
-        switch ($value) {
-            case 'en-US':
-            case 'en_US':
-                return 'en';
-                break;
-            case 'uk-UA':
-            case 'uk_UA':
-                return 'ua';
-                break;
-            case 'ru-RU':
-            case 'ru_RU':
-                return 'ru';
-                break;
-            case 'ka-GE':
-            case 'ka_GE':
-                return 'ge';
-                break;
+        if ($value === null) {
+            return null;
         }
-        return $value;
+
+        $locale = str_replace('_', '-', $value);
+        $lang   = Locale::getPrimaryLanguage($locale);
+
+        return match ($lang) {
+            'uk' => 'ua',
+            'ka' => 'ge',
+            'en' => 'en',
+            'ru' => 'ru',
+            'fr' => 'fr',
+            'de' => 'de',
+            'es' => 'es',
+            'it' => 'it',
+            'pt' => 'pt',
+            'zh' => 'zh',
+            'ja' => 'ja',
+            'ko' => 'ko',
+            'ar' => 'ar',
+            'tr' => 'tr',
+            'nl' => 'nl',
+            'sv' => 'sv',
+            'da' => 'da',
+            'no' => 'no',
+            'fi' => 'fi',
+            'pl' => 'pl',
+            'cs' => 'cs',
+            'hu' => 'hu',
+            'el' => 'el',
+            'ro' => 'ro',
+            'bg' => 'bg',
+            'he' => 'he',
+            'hi' => 'hi',
+            'bn' => 'bn',
+            'id' => 'id',
+            'th' => 'th',
+            'vi' => 'vi',
+
+            default => $lang,
+        };
     }
 }
