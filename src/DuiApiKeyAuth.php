@@ -114,12 +114,27 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
                 return null;
             }
 
-            if (!$auth->public_key) {
+            if (!$auth->public_key && !$auth->new_public_key) {
                 throw new ForbiddenHttpException(Yii::t('basic', 'AUTH_KEY_REQUIRED'));
             }
 
             try {
-                $decoded = JWT::decode($jwtToken, new Key($auth->public_key, self::JWT_METHOD));
+                // First try with new_public_key if available
+                if ($auth->new_public_key) {
+                    try {
+                        $decoded = JWT::decode($jwtToken, new Key($auth->new_public_key, self::JWT_METHOD));
+                    } catch (\Exception $e) {
+                        // If new key fails, try with the current public_key
+                        if ($auth->public_key) {
+                            $decoded = JWT::decode($jwtToken, new Key($auth->public_key, self::JWT_METHOD));
+                        } else {
+                            return null;
+                        }
+                    }
+                } else {
+                    // Only current key available
+                    $decoded = JWT::decode($jwtToken, new Key($auth->public_key, self::JWT_METHOD));
+                }
             } catch (\Exception $e) {
                 return null;
             }
