@@ -48,7 +48,7 @@ class DuiFileValidator extends \yii\validators\Validator
                 default => $fileSize,
             };
             if ($realFileSize > $fileSize) {
-                $model->addError($attribute, Yii::t('basic', 'MAX_FILE_SIZE_IS_INCORRECT {SIZE}', ['SIZE' => $this->maxSize]));
+                $model->addError($attribute, Yii::t('basic', 'MAX_FILE_SIZE_IS_INCORRECT {SIZE}', ['SIZE' => $this->maxSize / (1024 * 1024)]));
             }
         }
         
