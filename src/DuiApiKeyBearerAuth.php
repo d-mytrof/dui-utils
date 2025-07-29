@@ -64,16 +64,23 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
         }
 
         $entity = new $this->entityClassName;
-        $model = $entity::find()
+        $query = $entity::find()
             ->where([
                 'status' => $entity::STATUS_ACTIVE,
-            ])
-            ->andWhere([
+            ]);
+
+        // Check if the entity has new_api_key attribute
+        if ($entity->hasAttribute('new_api_key')) {
+            $query->andWhere([
                 'or',
                 ['api_key' => $authHeader],
                 ['new_api_key' => $authHeader]
-            ])
-            ->one();
+            ]);
+        } else {
+            $query->andWhere(['api_key' => $authHeader]);
+        }
+
+        $model = $query->one();
 
         if (!$model) {
             throw new ForbiddenHttpException(Yii::t('basic', 'API_INVALID_KEY'));
