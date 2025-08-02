@@ -155,7 +155,9 @@ class DuiApiKeyAuth extends BaseHttpBearerAuth
         }
 
         $model->api_key = null;
-        $model->new_api_key = null;
+        if ($model->hasAttribute('new_api_key')) {
+            $model->new_api_key = null;
+        }
         $model->public_key = null;
         if ($model->hasAttribute('private_key')) {
             $model->private_key = null;
