@@ -144,6 +144,19 @@ class DuiApiKeyBearerAuth extends BaseHttpBearerAuth
             return null;
         }
 
+        // Check if token is blacklisted
+        if (class_exists('models\AccessTokenBlacklist')) {
+            $blacklistClass = 'models\AccessTokenBlacklist';
+            // Check individual token blacklist
+            if ($blacklistClass::isBlacklisted($jwt)) {
+                return null;
+            }
+            // Check if user did signout-all after this token was issued
+            if (isset($decoded->iat) && $blacklistClass::areAllUserTokensBlacklisted($decoded->uid, $decoded->iat)) {
+                return null;
+            }
+        }
+
         $identityClass = $user->identityClass;
         $identity = $identityClass::findByUID($decoded->uid);
         if ($identity === null) {
